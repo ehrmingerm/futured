@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Committee Platform – Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@500;700&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&display=swap">
+<style>
+/* Layout: committee charter. Pale header band with an orange rule, sticky tabs, one working column of 1040px. Light theme only, as in the charter. */
+:root{
+  --orange:#F26A1B; --orange-text:#B5470E; --orange-tint:#FDE9DC;
+  --indigo:#2A2766; --indigo-tint:#E7E7F3;
+  --violet:#6B35B5; --violet-tint:#E8E6F5;
+  --ink:#1E1E2C; --muted:#5B6170; --surface:#FFFFFF; --soft:#F1F7F7; --rule:#D6DCE0;
+  --ok:#1F5C45; --ok-tint:#E3F0EA;
+  --wp1:#4F5BD5; --wp2:#3A7F1A; --wp3:#3F7A6B; --wp4:#C2246C; --wp5:#F2A51A; --wp6:#1C1C8F;
+  --f-head:"Lexend","Segoe UI",Arial,sans-serif;
+  --f-body:"Atkinson Hyperlegible",Verdana,Arial,sans-serif;
+  --r:8px;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--surface);color:var(--ink)}
+body{font-family:var(--f-body);font-size:16px;line-height:1.5}
+.wrap{max-width:1040px;margin:0 auto;padding:0 max(16px,env(safe-area-inset-left,0px))}
+h1,h2,h3{font-family:var(--f-head);font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:var(--indigo);margin:0;line-height:1.2;text-wrap:balance}
+h1{font-size:1.65rem}
+h2{font-size:1.1rem}
+h3{font-size:.95rem}
+p{margin:0}
+a{color:var(--orange-text)}
+a:hover{color:var(--indigo)}
+:focus-visible{outline:3px solid var(--indigo);outline-offset:2px}
+.eyebrow{font-family:var(--f-head);font-weight:500;font-size:.75rem;letter-spacing:.14em;text-transform:uppercase;color:var(--orange-text)}
+.label{font-family:var(--f-head);font-weight:500;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
+.muted{color:var(--muted)}
+.small{font-size:.9rem}
+.num{font-variant-numeric:tabular-nums}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+
+/* Header band */
+header.band{background:var(--soft);border-bottom:1px solid var(--rule)}
+header.band .wrap{padding-top:26px;padding-bottom:20px;display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between}
+.brand{border-left:4px solid var(--orange);padding-left:14px;display:grid;gap:6px}
+.brand .sub{color:var(--muted);font-size:.95rem}
+.who{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--muted)}
+.who b{color:var(--ink);font-weight:700}
+
+/* Tabs */
+nav.tabs{position:sticky;top:0;z-index:5;background:var(--surface);border-bottom:1px solid var(--rule)}
+nav.tabs .wrap{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+nav.tabs a{flex:none;padding:13px 12px 11px;color:var(--muted);text-decoration:none;font-family:var(--f-head);font-weight:500;font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;border-bottom:3px solid transparent}
+nav.tabs a:hover{color:var(--ink)}
+nav.tabs a[aria-current="page"]{color:var(--indigo);border-bottom-color:var(--orange)}
+nav.tabs .badge{display:inline-block;min-width:1.4em;margin-left:5px;padding:0 5px;border-radius:9px;background:var(--orange-tint);color:var(--orange-text);font-family:var(--f-body);font-size:.75rem;letter-spacing:0;text-align:center}
+
+main .wrap{padding-top:26px;padding-bottom:56px;display:grid;gap:28px}
+section.block{display:grid;gap:14px}
+.head{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;justify-content:space-between}
+.intro{max-width:68ch;color:var(--ink)}
+.notice{border:1px solid var(--rule);border-left:4px solid var(--orange);padding:12px 14px;border-radius:var(--r);background:var(--surface);font-size:.95rem}
+.notice.info{border-left-color:var(--indigo)}
+
+/* Buttons and fields */
+button,input,select,textarea{font:inherit;color:inherit}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--rule);background:var(--surface);border-radius:var(--r);padding:7px 13px;cursor:pointer;font-weight:700;font-size:.92rem;white-space:nowrap;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--indigo);color:var(--ink)}
+.btn.primary{background:var(--indigo);border-color:var(--indigo);color:#fff}
+.btn.primary:hover{background:#1d1b4d;color:#fff}
+.btn.ghost{border-color:transparent;background:transparent;color:var(--orange-text);padding:5px 8px;font-weight:700}
+.btn.ghost:hover{color:var(--indigo)}
+.btn.danger{color:#A3261C;border-color:#E9C9C5}
+.btn.armed{background:#A3261C;border-color:#A3261C;color:#fff}
+.btn:disabled{opacity:.55;cursor:default}
+input[type=text],input[type=url],input[type=date],input[type=month],input[type=search],select,textarea{background:var(--surface);border:1px solid #AEB6BE;border-radius:6px;padding:8px 10px;width:100%;max-width:100%}
+input[type=text],input[type=url],input[type=date],input[type=month],input[type=search],select{height:42px}
+textarea{min-height:90px;resize:vertical;line-height:1.45}
+.field{display:grid;gap:5px;min-width:0}
+.field>label{font-weight:700;font-size:.88rem}
+.field .hint{font-size:.82rem;color:var(--muted)}
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.filters .field{flex:1 1 170px}
+.filters .field.wide{flex:2 1 260px}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:7px 14px;cursor:pointer;font-weight:700;font-size:.9rem;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--indigo);color:#fff}
+
+/* Pills and tags */
+.pill{display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;padding:2px 9px;border-radius:11px;white-space:nowrap;border:1px solid transparent}
+.pill::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor}
+.pill.warn{background:var(--orange-tint);color:var(--orange-text)}
+.pill.ok{background:var(--ok-tint);color:var(--ok)}
+.pill.ok::before{border-radius:1px;transform:rotate(45deg)}
+.pill.info{background:var(--indigo-tint);color:var(--indigo)}
+.pill.neutral{background:var(--soft);color:var(--muted);border-color:var(--rule)}
+.pill.neutral::before{background:transparent;border:1.5px solid currentColor}
+.pill.off{background:var(--surface);color:var(--muted);border-color:var(--rule);text-decoration:line-through}
+.wp{display:inline-block;font-family:var(--f-head);font-weight:500;font-size:.72rem;letter-spacing:.06em;padding:2px 7px;border-radius:4px;color:#fff;white-space:nowrap}
+.wp.wp1{background:var(--wp1)}.wp.wp2{background:var(--wp2)}.wp.wp3{background:var(--wp3)}.wp.wp4{background:var(--wp4)}.wp.wp5{background:var(--wp5);color:var(--ink)}.wp.wp6{background:var(--wp6)}
+.wp.all{background:var(--soft);color:var(--ink);border:1px solid var(--rule)}
+.code{font-family:var(--f-head);font-weight:500;font-size:.78rem;letter-spacing:.06em;color:var(--orange-text)}
+
+/* Cards and lists */
+.panel{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface);padding:18px}
+.panel.soft{background:var(--soft);border-color:var(--soft)}
+.panel.decision{background:var(--orange-tint);border-color:var(--orange-tint)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:1px;background:var(--rule);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.tile{background:var(--surface);padding:14px 16px;display:grid;gap:4px;text-decoration:none;color:inherit}
+.tile:hover{background:var(--soft)}
+.tile .v{font-family:var(--f-head);font-weight:700;font-size:1.6rem;color:var(--indigo);font-variant-numeric:tabular-nums}
+.tile .v small{font-size:.85rem;color:var(--muted);font-weight:500}
+.list{border:1px solid var(--rule);border-radius:var(--r);background:var(--surface)}
+.item{padding:16px 18px;border-top:1px solid var(--rule);display:grid;gap:8px;min-width:0}
+.item:first-child{border-top:0}
+.item-top{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.item-top .grow{flex:1 1 auto}
+.item h3{text-transform:none;letter-spacing:0;font-size:1.05rem;color:var(--ink)}
+.item .body{max-width:72ch;overflow-wrap:anywhere}
+.meta{display:flex;flex-wrap:wrap;gap:4px 16px;font-size:.88rem;color:var(--muted)}
+.links{display:flex;flex-wrap:wrap;gap:8px}
+.empty{padding:20px 18px;color:var(--muted)}
+.answer{background:var(--violet-tint);border-radius:6px;padding:12px 14px;display:grid;gap:6px;max-width:76ch}
+.answer .label{color:var(--violet)}
+.persp{border-left:3px solid var(--orange);padding-left:10px}
+
+/* Meetings */
+.meeting{display:grid;grid-template-columns:150px minmax(0,1fr);gap:8px 22px;padding:18px;border-top:1px solid var(--rule)}
+.meeting:first-child{border-top:0}
+.meeting .when{display:grid;gap:3px;align-content:start}
+.meeting .when .d{font-family:var(--f-head);font-weight:700;color:var(--indigo);font-size:1.05rem;line-height:1.25}
+.meeting .content{display:grid;gap:10px;min-width:0}
+.docrow{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;padding:8px 10px;border:1px solid var(--rule);border-radius:6px}
+.docrow .grow{flex:1 1 160px;font-weight:700}
+@media (max-width:640px){.meeting{grid-template-columns:1fr}}
+
+/* Tables */
+.tablewrap{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--r)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.93rem}
+th{background:var(--indigo);color:#fff;font-family:var(--f-head);font-weight:700;font-size:.72rem;letter-spacing:.08em;text-transform:uppercase;text-align:left;padding:10px 12px;vertical-align:bottom}
+td{padding:11px 12px;border-top:1px solid var(--rule);vertical-align:top}
+td.nowrap{white-space:nowrap}
+
+/* Glossary */
+.theme-head{display:flex;gap:10px;align-items:baseline;padding-top:6px}
+.theme-head .letter{font-family:var(--f-head);font-weight:700;color:var(--orange-text)}
+.term{display:grid;grid-template-columns:minmax(150px,240px) minmax(0,1fr);gap:8px 24px;padding:16px 18px;border-top:1px solid var(--rule)}
+.term:first-child{border-top:0}
+.term .t{display:grid;gap:6px;align-content:start}
+.term .t b{font-size:1.05rem}
+.term .trans{font-size:.85rem;color:var(--muted)}
+.term .d{display:grid;gap:8px;max-width:70ch}
+@media (max-width:640px){.term{grid-template-columns:1fr}}
+.counts{display:flex;flex-wrap:wrap;gap:8px}
+
+/* Agenda */
+.month{display:grid;grid-template-columns:150px minmax(0,1fr);gap:10px 22px;padding:16px 18px;border-top:1px solid var(--rule)}
+.month:first-child{border-top:0}
+.month>.m{font-family:var(--f-head);font-weight:700;color:var(--indigo);text-transform:uppercase;letter-spacing:.04em;font-size:.9rem}
+.month .evts{display:grid;gap:12px}
+.evt{display:grid;grid-template-columns:110px minmax(0,1fr);gap:4px 14px}
+.evt .day{font-weight:700;font-variant-numeric:tabular-nums}
+.evt .what{display:grid;gap:4px}
+@media (max-width:640px){.month,.evt{grid-template-columns:1fr}}
+
+/* Form overlay */
+.overlay{position:fixed;inset:0;background:rgba(30,30,44,.45);z-index:20;display:flex;align-items:flex-start;justify-content:center;padding:4vh 12px;overflow-y:auto}
+.dialog{background:var(--surface);border-radius:10px;width:min(680px,100%);padding:22px;display:grid;gap:16px;border-top:5px solid var(--orange)}
+.dialog form{display:grid;gap:14px}
+.dialog .row2{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.dialog .actions{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;padding-top:6px}
+.err{color:#A3261C;font-weight:700;font-size:.92rem}
+footer{border-top:1px solid var(--rule);color:var(--muted);font-size:.85rem}
+footer .wrap{padding-top:14px;padding-bottom:22px;display:flex;flex-wrap:wrap;gap:6px 20px;justify-content:space-between}
+.demo-bar{background:var(--indigo);color:#fff;font-size:.9rem}
+.demo-bar .wrap{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between;padding-top:8px;padding-bottom:8px}
+.demo-switch{display:inline-flex;align-items:center;gap:8px}
+.demo-switch button{border:1px solid rgba(255,255,255,.6);background:transparent;color:#fff;border-radius:6px;padding:4px 10px;cursor:pointer;font:inherit}
+.demo-switch button[aria-pressed="true"]{background:#fff;color:var(--indigo);font-weight:700}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+</style>
+</head>
+<body>
+<header class="band"><div class="wrap">
+  <div class="brand">
+    <div class="eyebrow">Demo Committee · Project X WP5</div>
+    <h1>Committee platform</h1>
+    <div class="sub">Lived Experience Committee · Fictional example</div>
+  </div>
+  <div class="who" id="who"></div>
+</div></header>
+<nav class="tabs" aria-label="Sections"><div class="wrap" id="tabs"></div></nav>
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap"><span>Committee platform – demo with fictional content</span><span>Content kept by the Lived Experience Coordinator, WP5</span></div></footer>
+<div id="modal"></div>
+
+<script src="demo-data.js"></script>
+<script src="demo-shim.js"></script>
+<script>
+/* ---------------- Reference lists ---------------- */
+const VIEWS=[["home","Overview"],["meetings","Meetings"],["documents","Documents"],["log","Log"],["decisions","Decisions & actions"],["questions","Questions & answers"],["glossary","Glossary"],["agenda","Agenda"]];
+const WPS=["","WP1","WP2","WP3","WP4","WP5","WP6","All WPs"];
+const THEMES=[["A","The project and the Committee"],["B","Depression and its course"],["C","Research methods, data and statistics"],["D","Trials and interventions"],["E","Lived experience and involvement"]];
+const CATS=["Methodology","Analysis","Instruments and measures","Outcome","Psychiatry","Interventions","General","Concepts and wording"];
+const GSTATUS=["TO DEFINE","PROPOSED","IN REVIEW","TO CLARIFY","AGREED","RETIRED"];
+const LOGTYPES=["Question","Statement","Answer"];
+const PILL={"Open":"warn","To send":"warn","TO CLARIFY":"warn","Overdue":"warn","For comment":"warn",
+  "IN REVIEW":"info","Planned":"info","Circulated":"info","Recurring":"info","Date to be confirmed":"neutral",
+  "Approved":"ok","Done":"ok","Answered":"ok","Closed":"ok","Active":"ok","AGREED":"ok","Validated":"ok","Signed":"ok","Held":"ok","Confirmed":"ok","In use":"ok",
+  "Draft":"neutral","PROPOSED":"neutral","TO DEFINE":"neutral","Statement":"info","Question":"neutral","Answer":"ok","Awaiting PI feedback":"warn","Reference":"neutral","Not available":"neutral",
+  "Superseded":"off","Withdrawn":"off","Cancelled":"off","RETIRED":"off"};
+const TOPICS=["Governance","MoU","Support","Glossary","Invoicing","Data access","Research input","Calendar","Other"];
+
+/* Form schemas: one per collection */
+const SCHEMA={
+  meetings:{noun:"meeting",idFrom:"code",fields:[
+    {k:"code",l:"Meeting ID",t:"text",req:1,hint:"M1, M2, M3…",half:1},
+    {k:"status",l:"Status",t:"select",opts:["Planned","Held","Cancelled"],half:1},
+    {k:"date",l:"Date",t:"date",half:1,hint:"Leave empty if only the month is known"},
+    {k:"month",l:"Month (if the date is not fixed)",t:"month",half:1},
+    {k:"time",l:"Time",t:"text",hint:"9:00–10:00 (Paris time)",half:1},
+    {k:"format",l:"Format",t:"select",opts:["Video call","In person","Hybrid"],half:1},
+    {k:"topics",l:"Main topics",t:"textarea"},
+    {k:"wp",l:"Work package concerned",t:"select",opts:WPS,half:1},
+    {k:"slidesUrl",l:"Slides – link",t:"url",half:1},
+    {k:"slidesFile",l:"Slides – file",t:"file"},
+    {k:"minutesStatus",l:"Minutes status",t:"select",opts:["","Draft","Circulated","Approved"],half:1},
+    {k:"minutesUrl",l:"Minutes – link",t:"url",half:1},
+    {k:"minutesFile",l:"Minutes – file",t:"file"},
+    {k:"note",l:"Note",t:"textarea"}]},
+  documents:{noun:"document",idFrom:"title",fields:[
+    {k:"title",l:"Title",t:"text",req:1},
+    {k:"category",l:"Category",t:"select",opts:["Governance","Glossary","Project log","Practical","Reference"],half:1},
+    {k:"status",l:"Status",t:"select",opts:["Draft","For comment","Validated","Signed","In use","Reference","Superseded"],half:1},
+    {k:"version",l:"Version",t:"text",half:1},
+    {k:"date",l:"Date of this version",t:"date",half:1},
+    {k:"url",l:"Link",t:"url"},
+    {k:"file",l:"File",t:"file"},
+    {k:"key",l:"Show on the overview",t:"select",opts:["No","Yes"],half:1},
+    {k:"note",l:"Note",t:"textarea"}]},
+  decisions:{noun:"decision",idFrom:"code",fields:[
+    {k:"code",l:"Decision ID",t:"text",req:1,hint:"M3-D1",half:1},
+    {k:"meeting",l:"Meeting",t:"text",hint:"M3",half:1},
+    {k:"date",l:"Date",t:"date",half:1},
+    {k:"topic",l:"Topic",t:"select",opts:TOPICS,half:1},
+    {k:"text",l:"Decision",t:"textarea",req:1},
+    {k:"wp",l:"Work package",t:"select",opts:WPS,half:1},
+    {k:"status",l:"Status",t:"select",opts:["Active","Superseded","Withdrawn"],half:1},
+    {k:"replaces",l:"Replaces / replaced by",t:"text"}]},
+  actions:{noun:"action",idFrom:"code",fields:[
+    {k:"code",l:"Action ID",t:"text",req:1,hint:"M3-A1",half:1},
+    {k:"meeting",l:"Meeting",t:"text",hint:"M3",half:1},
+    {k:"text",l:"Action",t:"textarea",req:1},
+    {k:"owner",l:"Who",t:"text",half:1},
+    {k:"due",l:"Due",t:"date",half:1},
+    {k:"status",l:"Status",t:"select",opts:["Open","Done","Recurring","Cancelled"],half:1},
+    {k:"notes",l:"Notes",t:"text"}]},
+  log:{noun:"log entry",fields:[
+    {k:"dateAsked",l:"Date asked",t:"date",half:1},
+    {k:"dateAddressed",l:"Date addressed",t:"date",half:1},
+    {k:"type",l:"Type",t:"select",opts:LOGTYPES,half:1},
+    {k:"wp",l:"Work package",t:"select",opts:WPS,half:1},
+    {k:"topic",l:"Topic",t:"text",req:1},
+    {k:"comments",l:"Comments",t:"textarea"},
+    {k:"piFeedback",l:"PI feedback",t:"textarea"},
+    {k:"fromInbox",t:"hidden"}]},
+  questions:{noun:"question",fields:[
+    {k:"subject",l:"Subject",t:"text",req:1},
+    {k:"details",l:"Question",t:"textarea"},
+    {k:"askedOn",l:"Asked on",t:"date",half:1},
+    {k:"wp",l:"Work package",t:"select",opts:WPS,half:1},
+    {k:"response",l:"Answer",t:"textarea"},
+    {k:"respondedBy",l:"Answer from",t:"text",half:1},
+    {k:"answeredOn",l:"Answered on",t:"date",half:1},
+    {k:"status",l:"Status",t:"select",opts:["Open","Answered"],half:1},
+    {k:"fromInbox",t:"hidden"}]},
+  glossary:{noun:"term",idFrom:"term",fields:[
+    {k:"term",l:"Term",t:"text",req:1},
+    {k:"list",l:"List",t:"select",opts:["General","Others"],half:1},
+    {k:"status",l:"Status",t:"select",opts:GSTATUS,half:1},
+    {k:"category",l:"Category (General list)",t:"select",opts:["",...CATS],half:1},
+    {k:"theme",l:"Theme (Others list)",t:"select",opts:[["","—"],...THEMES.map(([a,b])=>[a,a+". "+b])],half:1},
+    {k:"fr",l:"French",t:"text",half:1},
+    {k:"de",l:"German",t:"text",half:1},
+    {k:"definition",l:"Plain-language definition",t:"textarea",hint:"One or two sentences, under 40 words. Researchers propose it first."},
+    {k:"inFD",l:"In the project",t:"textarea"},
+    {k:"perspectives",l:"Perspectives",t:"textarea",hint:"Differing views, when there is no consensus"},
+    {k:"source",l:"Source",t:"text"},
+    {k:"note",l:"Note",t:"text"},
+    {k:"order",l:"Order",t:"text",half:1},
+    {k:"fromInbox",t:"hidden"}]},
+  agenda:{noun:"agenda item",fields:[
+    {k:"title",l:"Item",t:"text",req:1},
+    {k:"kind",l:"Kind",t:"select",opts:["Milestone","Deadline","WP input","Event"],half:1},
+    {k:"wp",l:"Work package",t:"select",opts:WPS,half:1},
+    {k:"date",l:"Date",t:"date",half:1},
+    {k:"month",l:"Month (if the date is not fixed)",t:"month",half:1},
+    {k:"time",l:"Time",t:"text",half:1},
+    {k:"confirmed",l:"Date status",t:"select",opts:["Confirmed","To be confirmed"],half:1},
+    {k:"detail",l:"Details",t:"textarea"},
+    {k:"source",l:"Source",t:"text"}]}
+};
+const COLLS=["meetings","documents","log","decisions","actions","questions","glossary","agenda","inbox"];
+
+/* ---------------- Helpers ---------------- */
+const $=s=>document.querySelector(s);
+const esc=v=>String(v==null?"":v).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const safeUrl=u=>{try{const x=new URL(String(u));return /^https?:$/.test(x.protocol)?x.href:""}catch(e){return ""}};
+const MONTHS=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const DAYS=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+const parseISO=s=>{if(!s||!/^\d{4}-\d{2}-\d{2}$/.test(s))return null;const[y,m,d]=s.split("-").map(Number);return new Date(y,m-1,d)};
+const fDate=s=>{const d=parseISO(s);return d?`${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`:""};
+const fDay=s=>{const d=parseISO(s);return d?`${DAYS[d.getDay()]} ${d.getDate()} ${MONTHS[d.getMonth()]}`:""};
+const fMonth=s=>{if(!s||!/^\d{4}-\d{2}$/.test(s))return "";const[y,m]=s.split("-").map(Number);return `${MONTHS[m-1]} ${y}`};
+const pad=n=>String(n).padStart(2,"0");
+const todayISO=(()=>{const d=new Date();return d.getFullYear()+"-"+pad(d.getMonth()+1)+"-"+pad(d.getDate())})();
+const thisMonth=todayISO.slice(0,7);
+const sortKey=o=>o.date||(o.month?o.month+"-99":"9999-99-99");
+const isUpcoming=o=>o.date?o.date>=todayISO:(o.month?o.month>=thisMonth:true);
+const pill=s=>s?`<span class="pill ${PILL[s]||"neutral"}">${esc(s)}</span>`:"";
+const wpTag=w=>{if(!w)return "";if(w==="All WPs")return `<span class="wp all">All WPs</span>`;const m=/^WP([1-6])$/.exec(w);return m?`<span class="wp wp${m[1]}">${esc(w)}</span>`:""};
+const slug=s=>String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-+|-+$/g,"").slice(0,60);
+const rid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+const codeNum=c=>{const m=/(\d+)\D*(\d*)$/.exec(String(c||""));return m?Number(m[1])*1000+Number(m[2]||0):0};
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+function fileKind(f){const n=String(f&&f.name||"").toLowerCase();return n.endsWith(".pdf")?"PDF":/\.docx?$/.test(n)?"Word":/\.xlsx?$/.test(n)?"Excel":/\.pptx?$/.test(n)?"PowerPoint":"File"}
+function fileLink(f,label){if(!f||!f.id)return "";return `<button type="button" class="btn" data-action="dl" data-id="${esc(f.id)}" data-name="${esc(f.name||"file")}">${esc(label)} (${fileKind(f)})<span class="sr"> – ${esc(f.name||"")}</span></button>`}
+function urlLink(u,label){const s=safeUrl(u);return s?`<a class="btn" href="${esc(s)}" target="_blank" rel="noopener">${esc(label)}</a>`:""}
+
+/* ---------------- State ---------------- */
+const data={};COLLS.forEach(c=>data[c]=new Map());
+const loaded=new Set();
+let db=null,user=null,assets=null,uid=null,isAdmin=false,canWrite=false,roleLabel="";
+let dbState="loading",slow=false,writeError="";
+let view=VIEWS.some(v=>v[0]===location.hash.slice(1))?location.hash.slice(1):"home";
+let logTab=ls.get("lerp-logtab")||"decisions";
+const F={meeting:"",dstatus:"",astatus:"open",qstatus:"",gq:"",gcat:"",gstatus:"",glist:"General",ltype:"",lwp:"",lq:""};
+let modal=null;
+const names={};
+
+const list=c=>[...data[c].entries()].map(([id,d])=>Object.assign({id},d));
+
+/* ---------------- Derived ---------------- */
+function meetingsSorted(){return list("meetings").sort((a,b)=>sortKey(a)<sortKey(b)?-1:1)}
+function nextMeeting(){return meetingsSorted().find(m=>m.status==="Planned"&&isUpcoming(m))||null}
+function lastHeld(){return meetingsSorted().filter(m=>m.status==="Held").pop()||null}
+function openActions(){return list("actions").filter(a=>a.status==="Open")}
+function openQuestions(){return list("questions").filter(q=>q.status==="Open")}
+function awaitingPI(){return list("log").filter(e=>e.type==="Question"&&!e.piFeedback)}
+function pendingInbox(){
+  const out=[];
+  for(const[id,d]of data.inbox){for(const it of (Array.isArray(d.items)?d.items:[])){if(!it||it.handled)continue;out.push(Object.assign({uid:id},it))}}
+  return out.sort((a,b)=>String(b.at).localeCompare(String(a.at)));
+}
+function dateLabel(o){
+  if(o.date){return fDay(o.date)+" "+parseISO(o.date).getFullYear()}
+  if(o.month)return fMonth(o.month);
+  return "Date to be set";
+}
+
+/* ---------------- Render ---------------- */
+let raf=0;function scheduleRender(){if(raf)return;raf=requestAnimationFrame(()=>{raf=0;render()})}
+function render(){
+  const act=document.activeElement;let keep=null;
+  if(act&&act.id&&(act.tagName==="INPUT"||act.tagName==="TEXTAREA")&&!act.closest("#modal")){keep={id:act.id,s:act.selectionStart,e:act.selectionEnd}}
+  $("#who").innerHTML=roleLabel?`<span>You are viewing as</span><b>${esc(roleLabel)}</b>`:"";
+  const inboxN=isAdmin?pendingInbox().length:0;
+  $("#tabs").innerHTML=VIEWS.map(([k,l])=>{
+    let b="";if(k==="questions"&&inboxN)b=`<span class="badge" title="New submissions">${inboxN}</span>`;
+    return `<a href="#${k}"${view===k?' aria-current="page"':""}>${esc(l)}${b}</a>`}).join("");
+  const fn={home:vHome,meetings:vMeetings,documents:vDocuments,log:vLog,decisions:vDecisions,questions:vQuestions,glossary:vGlossary,agenda:vAgenda}[view];
+  $("#app").innerHTML=notices()+fn();
+  if(keep){const el=document.getElementById(keep.id);if(el){el.focus();try{el.setSelectionRange(keep.s,keep.e)}catch(e){}}}
+  resolveNames();
+}
+function notices(){
+  let h="";
+  if(dbState==="none")h+=`<div class="notice">The platform's content is stored online and cannot be reached in this view. Open the platform from its claude.ai link, signed in with the account it was shared with.</div>`;
+  else if(dbState==="loading"&&slow)h+=`<div class="notice">The content is taking longer than usual to load. Check your connection; the page will update on its own.</div>`;
+  if(writeError)h+=`<div class="notice">${esc(writeError)}</div>`;
+  return h;
+}
+function addBtn(coll,label){return isAdmin?`<button class="btn primary" type="button" data-action="add" data-coll="${coll}">${esc(label)}</button>`:""}
+function editBtn(coll,id){return isAdmin?`<button class="btn ghost" type="button" data-action="edit" data-coll="${coll}" data-id="${esc(id)}">Edit</button>`:""}
+function loading(){return dbState==="loading"?`<div class="empty">Loading…</div>`:""}
+
+/* Overview */
+function vHome(){
+  const nm=nextMeeting(),lh=lastHeld();
+  const oa=openActions(),ap=awaitingPI(),g=list("glossary").filter(t=>t.status!=="RETIRED"&&t.list==="General");
+  const agreed=g.filter(t=>t.status==="AGREED").length;
+  const docs=list("documents").filter(d=>d.key==="Yes");
+  const upcoming=agendaItems().filter(e=>isUpcoming(e)&&e.src!=="meeting").slice(0,4);
+  const mBlock=(m,label)=>!m?"":`<div class="panel ${label==="Next meeting"?"decision":""}" style="display:grid;gap:10px">
+    <div class="label">${label}</div>
+    <div class="item-top"><span class="code">${esc(m.code||"")}</span>${pill(m.status)}${wpTag(m.wp)}${m.date||m.status!=="Planned"?"":pill("Date to be confirmed")}</div>
+    <h2 style="text-transform:none;letter-spacing:0">${esc(dateLabel(m))}</h2>
+    <div class="meta">${m.time?`<span>${esc(m.time)}</span>`:""}${m.format?`<span>${esc(m.format)}</span>`:""}</div>
+    ${m.topics?`<p class="body">${esc(m.topics)}</p>`:""}
+    <div class="links">${matLinks(m)}</div></div>`;
+  return `<section class="block">
+    <p class="intro">This is the shared space of the Lived Experience Committee of Project X. You will find the slides and minutes of each meeting, the key documents, the log of decisions and actions, the questions and answers, the glossary and the agenda.</p>
+    ${loading()}
+    <div class="grid2">${mBlock(nm,"Next meeting")||`<div class="panel decision"><div class="label">Next meeting</div><p style="margin-top:8px">No meeting is planned yet.</p></div>`}${mBlock(lh,"Last meeting")}</div>
+  </section>
+  <section class="block">
+    <div class="tiles">
+      <a class="tile" href="#log"><span class="label">Awaiting PI feedback</span><span class="v">${ap.length}</span></a>
+      <a class="tile" href="#decisions" data-action="logtab" data-v="actions"><span class="label">Open actions</span><span class="v">${oa.length}</span></a>
+      <a class="tile" href="#glossary"><span class="label">Glossary terms agreed</span><span class="v">${agreed} <small>of ${g.length}</small></span></a>
+      <a class="tile" href="#decisions" data-action="logtab" data-v="decisions"><span class="label">Decisions recorded</span><span class="v">${list("decisions").length}</span></a>
+    </div>
+  </section>
+  <div class="grid2">
+    <section class="block"><div class="head"><h2>Coming up</h2><a href="#agenda">Full agenda</a></div>
+      <div class="list">${upcoming.length?upcoming.map(e=>`<div class="item"><div class="item-top"><span class="label">${esc(e.date?fDate(e.date):fMonth(e.month)||"Date to be set")}</span>${pill(e.kind)}${wpTag(e.wp)}</div><div class="body">${esc(e.title)}</div></div>`).join(""):`<div class="empty">Nothing scheduled.</div>`}</div>
+    </section>
+    <section class="block"><div class="head"><h2>Key documents</h2><a href="#documents">All documents</a></div>
+      <div class="list">${docs.length?docs.map(d=>`<div class="item"><div class="item-top"><b class="grow">${esc(d.title)}</b>${pill(d.status)}</div><div class="meta">${d.version?`<span>Version ${esc(d.version)}</span>`:""}${d.date?`<span>${esc(fDate(d.date))}</span>`:""}</div><div class="links">${urlLink(d.url,"Open")}${fileLink(d.file,"Download")}</div></div>`).join(""):`<div class="empty">No key document yet.</div>`}</div>
+    </section>
+  </div>`;
+}
+function matLinks(m){
+  const s=[urlLink(m.slidesUrl,"Slides"),fileLink(m.slidesFile,"Slides"),urlLink(m.minutesUrl,"Minutes"),fileLink(m.minutesFile,"Minutes")].filter(Boolean).join("");
+  return s||(m.status==="Held"?`<span class="muted small">Slides and minutes not added yet.</span>`:"");
+}
+
+/* Meetings */
+function vMeetings(){
+  const ms=meetingsSorted().reverse();
+  const up=ms.filter(m=>m.status==="Planned").reverse(),past=ms.filter(m=>m.status!=="Planned");
+  const dec=list("decisions"),act=list("actions");
+  const row=m=>{
+    const nd=dec.filter(d=>d.meeting===m.code).length,na=act.filter(a=>a.meeting===m.code).length;
+    const mats=[];
+    if(m.slidesUrl||m.slidesFile)mats.push(`<div class="docrow"><span class="grow">Slides</span>${urlLink(m.slidesUrl,"Open")}${fileLink(m.slidesFile,"Download")}</div>`);
+    if(m.minutesUrl||m.minutesFile||m.minutesStatus)mats.push(`<div class="docrow"><span class="grow">Minutes</span>${pill(m.minutesStatus)}${urlLink(m.minutesUrl,"Open")}${fileLink(m.minutesFile,"Download")}</div>`);
+    return `<div class="meeting">
+      <div class="when"><span class="code">${esc(m.code||"")}</span><span class="d">${esc(m.date?fDate(m.date):fMonth(m.month)||"Date to be set")}</span>${m.time?`<span class="small muted">${esc(m.time)}</span>`:""}${m.format?`<span class="small muted">${esc(m.format)}</span>`:""}</div>
+      <div class="content">
+        <div class="item-top"><span class="grow">${pill(m.status)} ${m.status==="Planned"&&!m.date?pill("Date to be confirmed"):""} ${wpTag(m.wp)}</span>${editBtn("meetings",m.id)}</div>
+        ${m.topics?`<p class="body">${esc(m.topics)}</p>`:""}
+        ${mats.join("")||(m.status==="Held"?`<p class="muted small">Slides and minutes not added yet.</p>`:"")}
+        ${m.note?`<p class="small muted body">${esc(m.note)}</p>`:""}
+        ${nd||na?`<div class="meta"><a href="#decisions" data-action="logmeeting" data-v="${esc(m.code)}">${nd} decision${nd===1?"":"s"} · ${na} action${na===1?"":"s"} in the log</a></div>`:""}
+      </div></div>`;
+  };
+  return `<section class="block"><div class="head"><h2>Upcoming meetings</h2>${addBtn("meetings","Add a meeting")}</div>
+    <div class="list">${up.length?up.map(row).join(""):loading()||`<div class="empty">No meeting planned.</div>`}</div></section>
+  <section class="block"><h2>Past meetings</h2>
+    <div class="list">${past.length?past.map(row).join(""):loading()||`<div class="empty">No meeting held yet.</div>`}</div></section>`;
+}
+
+/* Documents */
+function vDocuments(){
+  const cats=["Governance","Glossary","Project log","Practical","Reference"];
+  const ds=list("documents");
+  const groups=cats.map(c=>[c,ds.filter(d=>(d.category||"Reference")===c).sort((a,b)=>String(a.title).localeCompare(String(b.title)))]).filter(g=>g[1].length);
+  return `<section class="block"><div class="head"><h2>Key documents</h2>${addBtn("documents","Add a document")}</div>
+    <p class="intro muted">Slides and minutes are under Meetings. Some links open documents stored elsewhere (Google Drive, claude.ai); they open only for people who have access to them.</p>
+    ${loading()}
+    ${groups.length?groups.map(([c,items])=>`<div class="block" style="gap:10px"><div class="label">${esc(c)}</div><div class="list">${items.map(d=>`<div class="item">
+      <div class="item-top"><h3 class="grow">${esc(d.title)}</h3>${pill(d.status)}${editBtn("documents",d.id)}</div>
+      <div class="meta">${d.version?`<span>Version ${esc(d.version)}</span>`:""}${d.date?`<span>${esc(fDate(d.date))}</span>`:""}</div>
+      ${d.note?`<p class="body small">${esc(d.note)}</p>`:""}
+      <div class="links">${urlLink(d.url,"Open")}${fileLink(d.file,"Download")}${!safeUrl(d.url)&&!(d.file&&d.file.id)?`<span class="muted small">No link yet.</span>`:""}</div>
+    </div>`).join("")}</div></div>`).join(""):(dbState==="loading"?"":`<div class="list"><div class="empty">No document yet.</div></div>`)}
+  </section>`;
+}
+
+/* Log: exchanges with the PI and WP leads */
+function vLog(){
+  const q=F.lq.trim().toLowerCase();
+  const es=list("log").filter(e=>(!F.ltype||e.type===F.ltype)&&(!F.lwp||e.wp===F.lwp)&&(!q||[e.topic,e.comments,e.piFeedback].join(" ").toLowerCase().includes(q)))
+    .sort((a,b)=>String(b.dateAsked||"0").localeCompare(String(a.dateAsked||"0"))||String(a.topic).localeCompare(String(b.topic)));
+  const wps=[...new Set(list("log").map(e=>e.wp).filter(Boolean))];
+  return `<section class="block"><div class="head"><h2>Log</h2>${addBtn("log","Add an entry")}</div>
+    <p class="intro muted">Questions, statements and answers exchanged between the committee and the research team, with the PI's feedback. Under the MoU, advice that is not followed is explained.</p>
+    <div class="filters">
+      <div class="field wide"><label for="f-lq">Search</label><input type="search" id="f-lq" data-filter="lq" value="${esc(F.lq)}" placeholder="Topic, comments or feedback"></div>
+      <div class="field"><label for="f-ltype">Type</label><select id="f-ltype" data-filter="ltype"><option value="">All</option>${LOGTYPES.map(t=>`<option${F.ltype===t?" selected":""}>${t}</option>`).join("")}</select></div>
+      ${wps.length?`<div class="field"><label for="f-lwp">Work package</label><select id="f-lwp" data-filter="lwp"><option value="">All</option>${wps.sort().map(w=>`<option${F.lwp===w?" selected":""}>${esc(w)}</option>`).join("")}</select></div>`:""}
+    </div>
+    <div class="tablewrap"><table><thead><tr><th scope="col">Date asked</th><th scope="col">Date addressed</th><th scope="col">Type</th><th scope="col">Topic</th><th scope="col">Comments</th><th scope="col">PI feedback</th>${isAdmin?'<th scope="col"><span class="sr">Edit</span></th>':""}</tr></thead><tbody>
+    ${es.length?es.map(e=>`<tr><td class="nowrap">${e.dateAsked?esc(fDate(e.dateAsked)):'<span class="muted">Not yet</span>'}</td><td class="nowrap">${esc(fDate(e.dateAddressed))}</td><td>${pill(e.type)}</td><td><b>${esc(e.topic||"")}</b>${e.wp?`<div style="margin-top:4px">${wpTag(e.wp)}</div>`:""}</td><td>${esc(e.comments||"")}</td><td>${e.piFeedback?esc(e.piFeedback):(e.type==="Question"?pill("Awaiting PI feedback"):"")}</td>${isAdmin?`<td>${editBtn("log",e.id)}</td>`:""}</tr>`).join(""):`<tr><td colspan="7" class="muted">${dbState==="loading"?"Loading…":"No entry matches."}</td></tr>`}
+    </tbody></table></div></section>`;
+}
+
+/* Decisions and actions */
+function vDecisions(){
+  const meetings=[...new Set([...list("decisions"),...list("actions")].map(x=>x.meeting).filter(Boolean))].sort((a,b)=>codeNum(a)-codeNum(b));
+  const mOpt=`<div class="field"><label for="f-meeting">Meeting</label><select id="f-meeting" data-filter="meeting"><option value="">All meetings</option>${meetings.map(m=>`<option${F.meeting===m?" selected":""}>${esc(m)}</option>`).join("")}</select></div>`;
+  let body="";
+  if(logTab==="decisions"){
+    let ds=list("decisions").filter(d=>(!F.meeting||d.meeting===F.meeting)&&(!F.dstatus||d.status===F.dstatus)).sort((a,b)=>codeNum(b.code)-codeNum(a.code));
+    body=`<div class="filters">${mOpt}<div class="field"><label for="f-dstatus">Status</label><select id="f-dstatus" data-filter="dstatus"><option value="">All</option>${["Active","Superseded","Withdrawn"].map(s=>`<option${F.dstatus===s?" selected":""}>${s}</option>`).join("")}</select></div>${addBtn("decisions","Add a decision")}</div>
+    <div class="tablewrap"><table><thead><tr><th scope="col">ID</th><th scope="col">Date</th><th scope="col">Topic</th><th scope="col">Decision</th><th scope="col">WP</th><th scope="col">Status</th>${isAdmin?'<th scope="col"><span class="sr">Edit</span></th>':""}</tr></thead><tbody>
+    ${ds.length?ds.map(d=>`<tr><td class="nowrap"><span class="code">${esc(d.code)}</span></td><td class="nowrap">${esc(fDate(d.date))}</td><td>${esc(d.topic||"")}</td><td>${esc(d.text||"")}${d.replaces?`<div class="small muted">${esc(d.replaces)}</div>`:""}</td><td>${wpTag(d.wp)}</td><td>${pill(d.status)}</td>${isAdmin?`<td>${editBtn("decisions",d.id)}</td>`:""}</tr>`).join(""):`<tr><td colspan="7" class="muted">${dbState==="loading"?"Loading…":"No decision matches."}</td></tr>`}
+    </tbody></table></div>`;
+  }else{
+    let as=list("actions").filter(a=>(!F.meeting||a.meeting===F.meeting)&&(F.astatus==="open"?(a.status==="Open"||a.status==="Recurring"):(!F.astatus||a.status===F.astatus))).sort((a,b)=>codeNum(b.code)-codeNum(a.code));
+    body=`<div class="filters">${mOpt}<div class="field"><label for="f-astatus">Status</label><select id="f-astatus" data-filter="astatus">${[["open","Open and recurring"],["","All"],["Done","Done"],["Cancelled","Cancelled"]].map(([v,l])=>`<option value="${v}"${F.astatus===v?" selected":""}>${l}</option>`).join("")}</select></div>${addBtn("actions","Add an action")}</div>
+    <div class="tablewrap"><table><thead><tr><th scope="col">ID</th><th scope="col">Action</th><th scope="col">Who</th><th scope="col">Due</th><th scope="col">Status</th>${isAdmin?'<th scope="col"><span class="sr">Edit</span></th>':""}</tr></thead><tbody>
+    ${as.length?as.map(a=>{const late=a.status==="Open"&&a.due&&a.due<todayISO;return `<tr><td class="nowrap"><span class="code">${esc(a.code)}</span></td><td>${esc(a.text||"")}${a.notes?`<div class="small muted">${esc(a.notes)}</div>`:""}</td><td>${esc(a.owner||"")}</td><td class="nowrap">${esc(fDate(a.due))}</td><td>${pill(a.status)}${late?" "+pill("Overdue"):""}</td>${isAdmin?`<td>${editBtn("actions",a.id)}</td>`:""}</tr>`}).join(""):`<tr><td colspan="6" class="muted">${dbState==="loading"?"Loading…":"No action matches."}</td></tr>`}
+    </tbody></table></div>`;
+  }
+  return `<section class="block"><div class="head"><h2>Decisions & actions</h2><div class="seg" role="group" aria-label="Show decisions or actions"><button type="button" data-action="logtab" data-v="decisions" aria-pressed="${logTab==="decisions"}">Decisions</button><button type="button" data-action="logtab" data-v="actions" aria-pressed="${logTab==="actions"}">Actions</button></div></div>
+  <p class="intro muted">Decisions and actions recorded in the minutes. IDs follow the minutes: M2-D1 is decision 1 of meeting 2, M2-A1 its action 1. A decision is never deleted: when it changes, it is marked Superseded and the new decision says what it replaces.</p>
+  ${body}</section>`;
+}
+
+/* Questions & answers: members' questions to the coordinator */
+function vQuestions(){
+  const order={"Open":0,"Answered":1};
+  const qs=list("questions").filter(q=>!F.qstatus||q.status===F.qstatus).sort((a,b)=>(order[a.status]??9)-(order[b.status]??9)||String(b.askedOn||"").localeCompare(String(a.askedOn||"")));
+  const inbox=pendingInbox().filter(i=>i.kind!=="term");
+  const item=q=>`<div class="item">
+    <div class="item-top">${pill(q.status)}${wpTag(q.wp)}<span class="grow meta">${q.askedOn?`Asked on ${esc(fDate(q.askedOn))}`:""}</span>${editBtn("questions",q.id)}</div>
+    <h3>${esc(q.subject||"")}</h3>
+    ${q.details?`<p class="body">${esc(q.details)}</p>`:""}
+    ${q.response?`<div class="answer"><span class="label">Answer${q.respondedBy?" · "+esc(q.respondedBy):""}${q.answeredOn?" · "+esc(fDate(q.answeredOn)):""}</span><p>${esc(q.response)}</p></div>`:""}
+  </div>`;
+  return `<section class="block"><div class="head"><h2>Questions & answers</h2>${addBtn("questions","Add a question")}</div>
+    <p class="intro muted">Questions from committee members to the coordinator, and the answers. Exchanges with the PI and the WP leads are in the Log.</p>
+    ${askPanel("question")}
+    ${inbox.length?`<div class="block" style="gap:10px"><div class="label">Sent by members, not yet handled</div><div class="list">${inbox.map(inboxItem).join("")}</div></div>`:""}
+    <div class="filters"><div class="field"><label for="f-qstatus">Status</label><select id="f-qstatus" data-filter="qstatus"><option value="">All</option>${["Open","Answered"].map(s=>`<option${F.qstatus===s?" selected":""}>${s}</option>`).join("")}</select></div></div>
+    <div class="list">${qs.length?qs.map(item).join(""):loading()||`<div class="empty">No question yet.</div>`}</div>
+  </section>`;
+}
+function askPanel(kind){
+  if(!(canWrite&&uid))return "";
+  if(kind==="question")return `<form class="panel soft" data-form="ask" style="display:grid;gap:12px">
+    <div class="label">Ask a question or make a statement</div>
+    <div class="field"><label for="ask-text">Your question or statement</label><textarea id="ask-text" name="text" required></textarea></div>
+    <div class="filters"><div class="field"><label for="ask-type">Type</label><select id="ask-type" name="type"><option>Question</option><option>Statement</option></select></div>
+    <div class="field"><label for="ask-wp">Work package (optional)</label><select id="ask-wp" name="wp">${WPS.map(w=>`<option value="${w}">${w||"Not specific"}</option>`).join("")}</select></div>
+    <button class="btn primary" type="submit">Send to the coordinator</button></div>
+    <p class="small muted">The coordinator answers it here, or passes it on to the research team and records it in the Log. Other platform users can see what you send.</p></form>`;
+  return `<form class="panel soft" data-form="term" style="display:grid;gap:12px">
+    <div class="label">Propose a term</div>
+    <div class="filters"><div class="field"><label for="term-term">Term</label><input type="text" id="term-term" name="term" required></div>
+    <div class="field wide"><label for="term-where">Where you met it (optional)</label><input type="text" id="term-where" name="where"></div></div>
+    <div class="field"><label for="term-text">What is unclear, or a suggested wording (optional)</label><textarea id="term-text" name="text"></textarea></div>
+    <div><button class="btn primary" type="submit">Send to the coordinator</button></div></form>`;
+}
+function inboxItem(i){
+  const who=`<span data-uid="${esc(i.uid)}">${esc(names[i.uid]||"A member")}</span>`;
+  const b=(to,l)=>`<button class="btn" type="button" data-action="inbox-to" data-to="${to}" data-uid="${esc(i.uid)}" data-iid="${esc(i.id)}">${l}</button>`;
+  const adminBtns=isAdmin?`<div class="links">${i.kind==="term"?b("glossary","Add to the glossary"):b("questions","Answer in Q&A")+b("log","Add to the log")}<button class="btn ghost" type="button" data-action="inbox-done" data-uid="${esc(i.uid)}" data-iid="${esc(i.id)}">Mark as handled</button></div>`:"";
+  const at=String(i.at||"").slice(0,10);
+  return `<div class="item"><div class="item-top">${pill(i.kind==="term"?"Term":(i.type||"Question"))}${wpTag(i.wp)}<span class="meta">${who}${at?` · ${esc(fDate(at))}`:""}</span></div>
+    ${i.term?`<h3>${esc(i.term)}</h3>`:""}${i.text?`<p class="body">${esc(i.text)}</p>`:""}${i.where?`<p class="small muted">Met in: ${esc(i.where)}</p>`:""}${adminBtns}</div>`;
+}
+
+/* Glossary */
+function vGlossary(){
+  const all=list("glossary");
+  const inList=t=>!F.glist||(t.list||"Others")===F.glist;
+  const q=F.gq.trim().toLowerCase();
+  const pool=all.filter(inList);
+  const ts=pool.filter(t=>(!F.gcat||t.category===F.gcat)&&(!F.gstatus||t.status===F.gstatus)&&(!q||[t.term,t.fr,t.de,t.definition,t.inFD,t.perspectives].join(" ").toLowerCase().includes(q)));
+  const counts=GSTATUS.map(s=>[s,pool.filter(t=>t.status===s).length]).filter(x=>x[1]);
+  const inbox=pendingInbox().filter(i=>i.kind==="term");
+  const byOrder=(a,b)=>(Number(a.order)||99)-(Number(b.order)||99)||String(a.term).localeCompare(String(b.term));
+  const gen=ts.filter(t=>t.list==="General"),oth=ts.filter(t=>t.list!=="General");
+  const groups=[];
+  for(const c of CATS){const it=gen.filter(t=>t.category===c).sort(byOrder);if(it.length)groups.push(["General",c,it])}
+  const genNoCat=gen.filter(t=>!CATS.includes(t.category));if(genNoCat.length)groups.push(["General","Not classified",genNoCat.sort(byOrder)]);
+  for(const[k,l]of THEMES){const it=oth.filter(t=>t.theme===k).sort(byOrder);if(it.length)groups.push(["Others",l,it])}
+  const othNo=oth.filter(t=>!THEMES.some(([k])=>k===t.theme));if(othNo.length)groups.push(["Others","Not classified",othNo.sort(byOrder)]);
+  const term=t=>`<div class="term">
+    <div class="t"><b>${esc(t.term)}</b>${t.fr||t.de?`<span class="trans">${t.fr?`FR ${esc(t.fr)}`:""}${t.fr&&t.de?"<br>":""}${t.de?`DE ${esc(t.de)}`:""}</span>`:""}<span>${pill(t.status)}</span></div>
+    <div class="d"><div class="item-top"><p class="grow body">${t.definition?esc(t.definition):`<span class="muted">Definition to be proposed by the researchers.</span>`}</p>${editBtn("glossary",t.id)}</div>
+      ${t.inFD?`<p class="small"><span class="label">In the project</span><br>${esc(t.inFD)}</p>`:""}
+      ${t.perspectives?`<p class="small persp"><span class="label">Perspectives</span><br>${esc(t.perspectives)}</p>`:""}
+      ${t.source?`<p class="small muted">Source: ${esc(t.source)}</p>`:""}
+      ${t.note?`<p class="small muted">${esc(t.note)}</p>`:""}</div></div>`;
+  const nG=all.filter(t=>t.list==="General").length,nO=all.length-nG;
+  let lastList="";
+  const blocks=groups.map(([lst,l,items])=>{const head=(F.glist===""&&lst!==lastList)?`<h2 style="margin-top:8px">${lst==="General"?"General list":"Others"}</h2>`:"";lastList=lst;
+    return `${head}<div class="block" style="gap:10px"><div class="theme-head"><h3>${esc(l)}</h3><span class="muted small">${items.length} term${items.length===1?"":"s"}</span></div><div class="list">${items.map(term).join("")}</div></div>`}).join("");
+  return `<section class="block"><div class="head"><h2>Glossary</h2>${addBtn("glossary","Add a term")}</div>
+    <p class="intro muted">Plain-language meanings of the words used in the project. Researchers propose a definition, the committee reviews it from lived experience, then both refine it together. Where views differ, they are recorded under Perspectives.</p>
+    <div class="head"><div class="seg" role="group" aria-label="Which list">${[["General",`General list (${nG})`],["Others",`Others (${nO})`],["","Both"]].map(([v,l])=>`<button type="button" data-action="glist" data-v="${v}" aria-pressed="${F.glist===v}">${esc(l)}</button>`).join("")}</div></div>
+    <p class="small muted">${F.glist==="Others"?"Others: terms drafted by the coordinator from project documents, not yet on the committee's working list.":"General list: the terms the committee will work on, by category."}</p>
+    <div class="counts">${counts.map(([s,n])=>`<button type="button" class="btn" data-action="gstatus" data-v="${esc(s)}" aria-pressed="${F.gstatus===s}">${pill(s)} <span class="num">${n}</span></button>`).join("")}</div>
+    <div class="filters">
+      <div class="field wide"><label for="f-gq">Search</label><input type="search" id="f-gq" data-filter="gq" value="${esc(F.gq)}" placeholder="Term, translation or definition"></div>
+      ${F.glist!=="Others"?`<div class="field"><label for="f-gcat">Category</label><select id="f-gcat" data-filter="gcat"><option value="">All categories</option>${CATS.map(c=>`<option${F.gcat===c?" selected":""}>${esc(c)}</option>`).join("")}</select></div>`:""}
+      <div class="field"><label for="f-gstatus">Status</label><select id="f-gstatus" data-filter="gstatus"><option value="">All</option>${GSTATUS.map(s=>`<option${F.gstatus===s?" selected":""}>${s}</option>`).join("")}</select></div>
+    </div>
+    ${blocks||(loading()||`<div class="list"><div class="empty">No term matches.</div></div>`)}
+    ${askPanel("term")}
+    ${inbox.length?`<div class="block" style="gap:10px"><div class="label">Terms proposed by members</div><div class="list">${inbox.map(inboxItem).join("")}</div></div>`:""}
+  </section>`;
+}
+
+/* Agenda */
+function agendaItems(){
+  const out=[];
+  for(const m of list("meetings")){if(m.status==="Cancelled")continue;out.push({src:"meeting",id:m.id,date:m.date,month:m.month,title:`Committee meeting ${m.code||""}`.trim()+(m.topics?` – ${m.topics}`:""),kind:"Meeting",wp:m.wp,time:[m.time,m.format].filter(Boolean).join(" · "),confirmed:m.date?"Confirmed":"To be confirmed"})}
+  for(const a of list("agenda"))out.push(Object.assign({src:"agenda"},a));
+  for(const a of list("actions")){if(a.status==="Open"&&a.due)out.push({src:"action",id:a.id,date:a.due,title:`${a.code}: ${a.text}`,kind:"Action due",detail:a.owner?`Who: ${a.owner}`:""})}
+  return out.sort((a,b)=>sortKey(a)<sortKey(b)?-1:sortKey(a)>sortKey(b)?1:0);
+}
+function vAgenda(){
+  const items=agendaItems();
+  const up=items.filter(isUpcoming),past=items.filter(e=>!up.includes(e)).reverse();
+  const byMonth=arr=>{const g=new Map();for(const e of arr){const k=e.date?e.date.slice(0,7):(e.month||"");if(!g.has(k))g.set(k,[]);g.get(k).push(e)}return [...g.entries()]};
+  const evt=e=>`<div class="evt"><span class="day">${e.date?esc(fDay(e.date)):`<span class="muted">Date to be set</span>`}</span><div class="what">
+    <div class="item-top">${pill(e.kind==="Meeting"?"Meeting":e.kind)}${wpTag(e.wp)}${e.confirmed==="To be confirmed"?pill("Date to be confirmed"):""}<span class="grow"></span>${e.src==="agenda"?editBtn("agenda",e.id):""}</div>
+    <div class="body">${esc(e.title)}</div>${e.time?`<div class="small muted">${esc(e.time)}</div>`:""}${e.detail?`<div class="small body">${esc(e.detail)}</div>`:""}${e.source?`<div class="small muted">Source: ${esc(e.source)}</div>`:""}</div></div>`;
+  const block=arr=>byMonth(arr).map(([k,es])=>`<div class="month"><div class="m">${esc(fMonth(k)||"Undated")}</div><div class="evts">${es.map(evt).join("")}</div></div>`).join("");
+  return `<section class="block"><div class="head"><h2>Agenda</h2>${addBtn("agenda","Add an item")}</div>
+    <p class="intro muted">Meetings, work package milestones and open actions with a due date, in one timeline. Times are Paris time.</p>
+    <div class="list">${up.length?block(up):loading()||`<div class="empty">Nothing scheduled.</div>`}</div></section>
+  ${past.length?`<section class="block"><h2>Past</h2><div class="list">${block(past)}</div></section>`:""}`;
+}
+
+/* ---------------- Names of members who submitted ---------------- */
+async function resolveNames(){
+  if(!user)return;
+  const ids=[...new Set([...document.querySelectorAll("[data-uid]")].map(e=>e.getAttribute("data-uid")))];
+  if(!ids.length)return;
+  try{const ps=await user.profiles(ids);for(const id of ids){const n=(ps[id]&&ps[id].name)||"";if(n)names[id]=n}
+    document.querySelectorAll("span[data-uid]").forEach(e=>{const n=names[e.getAttribute("data-uid")];if(n)e.textContent=n});}catch(e){}
+}
+
+/* ---------------- Writes ---------------- */
+const chains=new Map();
+function queue(path,fn){const c=(chains.get(path)||Promise.resolve()).then(fn);chains.set(path,c.catch(()=>{}));return c}
+function onWriteError(e){
+  const code=e&&e.code;
+  if(code==="invalid_argument"){writeError="This change could not be saved: your access to the platform does not allow it. Ask the coordinator for edit access."}
+  else if(code==="quota_exceeded"){writeError="The platform's storage is full. Delete old entries to continue."}
+  else if(code==="revoked"){writeError="Your access to the platform has changed. Reload the page."}
+  else{writeError="A change could not be saved. Check your connection and try again."}
+  scheduleRender();
+}
+async function saveDoc(coll,id,obj){
+  const path=coll+"/"+id;
+  return queue(path,()=>db.doc(path).set(obj));
+}
+async function deleteDoc(coll,id){const path=coll+"/"+id;return queue(path,()=>db.doc(path).delete())}
+async function addInbox(entry){
+  const path="inbox/"+uid;
+  return queue(path,async()=>{const cur=data.inbox.get(uid);const items=(cur&&Array.isArray(cur.items)?cur.items:[]).map(x=>Object.assign({},x));items.push(entry);await db.doc(path).set({items})});
+}
+async function markInbox(u,iid){
+  const path="inbox/"+u;
+  return queue(path,async()=>{const cur=data.inbox.get(u);if(!cur||!Array.isArray(cur.items))return;const items=cur.items.map(x=>x&&x.id===iid?Object.assign({},x,{handled:true}):Object.assign({},x));await db.doc(path).set({items})});
+}
+
+/* ---------------- Form overlay ---------------- */
+function openForm(coll,id,prefill){
+  const s=SCHEMA[coll];const cur=id?JSON.parse(JSON.stringify(data[coll].get(id)||{})):Object.assign({},prefill||{});
+  modal={coll,id,values:cur,error:"",busy:false,armed:false};renderModal();
+  setTimeout(()=>{const f=document.querySelector("#modal input,#modal select,#modal textarea");if(f)f.focus()},0);
+}
+function closeForm(){modal=null;$("#modal").innerHTML=""}
+function fieldHTML(f,v){
+  const id="m-"+f.k;const req=f.req?" required":"";
+  let input="";
+  if(f.t==="textarea")input=`<textarea id="${id}" name="${f.k}"${req}>${esc(v||"")}</textarea>`;
+  else if(f.t==="select")input=`<select id="${id}" name="${f.k}">${f.opts.map(o=>{const[val,l]=Array.isArray(o)?o:[o,o||"—"];return `<option value="${esc(val)}"${String(v||"")===String(val)?" selected":""}>${esc(l)}</option>`}).join("")}</select>`;
+  else if(f.t==="file"){
+    if(!assets)return "";
+    const cur=v&&v.id?`<span class="small">Current file: ${esc(v.name||"PDF")} <label><input type="checkbox" name="${f.k}__remove"> remove</label></span>`:"";
+    input=`${cur}<input type="file" id="${id}" name="${f.k}" accept=".pdf,.docx,.xlsx,.pptx,image/*">`;
+  }
+  else input=`<input type="${f.t==="url"?"url":f.t}" id="${id}" name="${f.k}" value="${esc(v||"")}"${req}${f.t==="url"?' placeholder="https://"':""}>`;
+  return `<div class="field"${f.half?' data-half="1"':""}><label for="${id}">${esc(f.l)}${f.req?" (required)":""}</label>${input}${f.hint?`<span class="hint">${esc(f.hint)}</span>`:""}</div>`;
+}
+function renderModal(){
+  if(!modal){$("#modal").innerHTML="";return}
+  const s=SCHEMA[modal.coll];const fs=s.fields.filter(f=>f.t!=="hidden");
+  let html="",buf=[];
+  const flush=()=>{if(buf.length){html+=`<div class="row2">${buf.join("")}</div>`;buf=[]}};
+  for(const f of fs){const h=fieldHTML(f,modal.values[f.k]);if(!h)continue;if(f.half)buf.push(h);else{flush();html+=h}}
+  flush();
+  $("#modal").innerHTML=`<div class="overlay" data-action="overlay"><div class="dialog" role="dialog" aria-modal="true" aria-labelledby="m-title">
+    <h2 id="m-title">${modal.id?"Edit":"Add"} ${esc(s.noun)}</h2>
+    <form data-form="modal" novalidate>${html}
+      ${modal.error?`<p class="err" role="alert">${esc(modal.error)}</p>`:""}
+      <div class="actions"><div>${modal.id?`<button type="button" class="btn danger${modal.armed?" armed":""}" data-action="m-delete">${modal.armed?"Confirm deletion":"Delete"}</button>`:""}</div>
+      <div class="links"><button type="button" class="btn" data-action="m-cancel">Cancel</button><button type="submit" class="btn primary"${modal.busy?" disabled":""}>${modal.busy?"Saving…":"Save"}</button></div></div>
+    </form></div></div>`;
+}
+async function submitModal(form){
+  const s=SCHEMA[modal.coll];const vals=Object.assign({},modal.values);const uploads=[];
+  for(const f of s.fields){
+    if(f.t==="hidden")continue;
+    const el=form.elements[f.k];if(!el)continue;
+    if(f.t==="file"){
+      const rm=form.elements[f.k+"__remove"];if(rm&&rm.checked)delete vals[f.k];
+      const file=el.files&&el.files[0];if(file)uploads.push([f.k,file]);
+      continue;
+    }
+    const v=String(el.value||"").trim();
+    if(v)vals[f.k]=v;else delete vals[f.k];
+  }
+  modal.values=vals;
+  const fail=msg=>{modal.error=msg;modal.busy=false;renderModal()};
+  for(const f of s.fields){if(f.req&&!vals[f.k])return fail(`Fill in “${f.l}”.`)}
+  for(const k of Object.keys(vals))if(typeof vals[k]==="string"&&/url$/i.test(k)&&vals[k]&&!safeUrl(vals[k]))return fail("A link must start with https://");
+  modal.busy=true;modal.error="";renderModal();
+  for(const[k,file]of uploads){
+    try{const r=await assets.upload(file);vals[k]={id:r.id,name:file.name,size:r.sizeBytes||file.size}}
+    catch(e){return fail("The file could not be uploaded. PDF files up to 20 MB are accepted.")}
+  }
+  let id=modal.id;
+  if(!id){let base=slug(s.idFrom?vals[s.idFrom]:"")||rid();id=base;let n=2;while(data[modal.coll].has(id))id=base+"-"+(n++)}
+  vals.updated=new Date().toISOString();
+  try{
+    await saveDoc(modal.coll,id,vals);
+    if(vals.fromInbox&&!modal.id){const[u,iid]=String(vals.fromInbox).split("|");if(u&&iid)markInbox(u,iid).catch(onWriteError)}
+    closeForm();
+  }catch(e){modal.busy=false;modal.error="The change could not be saved. "+(e&&e.code==="invalid_argument"?"Your access does not allow editing.":"Check your connection and try again.");renderModal()}
+}
+
+/* ---------------- Events ---------------- */
+document.addEventListener("click",async ev=>{
+  const t=ev.target.closest("[data-action]");if(!t)return;
+  const a=t.getAttribute("data-action");
+  if(a==="overlay"){if(ev.target===t)closeForm();return}
+  if(a==="add"){openForm(t.dataset.coll,null,t.dataset.coll==="meetings"?{status:"Planned",format:"Video call"}:t.dataset.coll==="glossary"?{status:"TO DEFINE",list:"General"}:t.dataset.coll==="log"?{type:"Question",dateAsked:todayISO}:t.dataset.coll==="actions"?{status:"Open"}:t.dataset.coll==="decisions"?{status:"Active"}:t.dataset.coll==="questions"?{status:"Open",askedOn:todayISO}:t.dataset.coll==="agenda"?{confirmed:"Confirmed",kind:"Milestone"}:{});return}
+  if(a==="edit"){openForm(t.dataset.coll,t.dataset.id);return}
+  if(a==="m-cancel"){closeForm();return}
+  if(a==="m-delete"){if(!modal.armed){modal.armed=true;renderModal();return}const{coll,id}=modal;closeForm();deleteDoc(coll,id).catch(onWriteError);return}
+  if(a==="logtab"){logTab=t.dataset.v;ls.set("lerp-logtab",logTab);if(view!=="decisions"){return}ev.preventDefault();scheduleRender();return}
+  if(a==="logmeeting"){F.meeting=t.dataset.v;return}
+  if(a==="glist"){F.glist=t.dataset.v;F.gstatus="";F.gcat="";scheduleRender();return}
+  if(a==="gstatus"){F.gstatus=F.gstatus===t.dataset.v?"":t.dataset.v;scheduleRender();return}
+  if(a==="inbox-to"){
+    const it=pendingInbox().find(i=>i.uid===t.dataset.uid&&i.id===t.dataset.iid);if(!it)return;
+    const from=it.uid+"|"+it.id;
+    const day=String(it.at||"").slice(0,10);
+    if(t.dataset.to==="glossary")openForm("glossary",null,{term:it.term||"",list:"General",status:"TO DEFINE",note:[it.where?`Met in: ${it.where}.`:"",it.text?`Member's note: ${it.text}`:""].filter(Boolean).join(" "),fromInbox:from});
+    else if(t.dataset.to==="log")openForm("log",null,{type:it.type||"Question",topic:String(it.text||"").slice(0,90),comments:it.text||"",wp:it.wp||"",dateAsked:day,fromInbox:from});
+    else openForm("questions",null,{subject:String(it.text||"").slice(0,90),details:it.text||"",wp:it.wp||"",askedOn:day,status:"Open",fromInbox:from});
+    return;
+  }
+  if(a==="dl"){
+    const id=t.dataset.id,name=t.dataset.name||"file";const label=t.innerHTML;t.disabled=true;t.textContent="Preparing…";
+    try{
+      const r=await fetch((window.LERP_BLOB_BASE||"/_blob/")+encodeURIComponent(id));if(!r.ok)throw {code:"missing"};
+      const blob=await r.blob();
+      const d=window.claude&&typeof window.claude.use==="function"?await window.claude.use("downloads"):null;
+      if(!d)throw {code:"unavailable"};
+      await d.save({filename:name,data:blob});
+    }catch(e){
+      if(!(e&&e.code==="declined")){writeError=e&&e.code==="missing"?"This file could not be found. Ask the coordinator to add it again.":"The download is not available in this view. Open the platform from its claude.ai link and try again.";scheduleRender()}
+    }finally{t.disabled=false;t.innerHTML=label}
+    return;
+  }
+  if(a==="inbox-done"){markInbox(t.dataset.uid,t.dataset.iid).catch(onWriteError);return}
+});
+document.addEventListener("submit",async ev=>{
+  const f=ev.target;const k=f.getAttribute("data-form");if(!k)return;ev.preventDefault();
+  if(k==="modal"){if(!modal||modal.busy)return;submitModal(f);return}
+  if(k==="ask"||k==="term"){
+    const fd=new FormData(f);const entry={id:rid(),kind:k==="term"?"term":"question",at:new Date().toISOString()};
+    for(const[n,v]of fd.entries()){const s=String(v).trim();if(s)entry[n]=s}
+    if(k==="ask"&&!entry.text)return;if(k==="term"&&!entry.term)return;
+    const btn=f.querySelector("button[type=submit]");btn.disabled=true;btn.textContent="Sending…";
+    try{await addInbox(entry);f.reset();btn.textContent="Sent";setTimeout(()=>{btn.disabled=false;btn.textContent="Send to the coordinator"},2000)}
+    catch(e){btn.disabled=false;btn.textContent="Send to the coordinator";onWriteError(e)}
+  }
+});
+document.addEventListener("input",ev=>{const k=ev.target.getAttribute&&ev.target.getAttribute("data-filter");if(k==="gq"||k==="lq"){F[k]=ev.target.value;scheduleRender()}});
+document.addEventListener("change",ev=>{const k=ev.target.getAttribute&&ev.target.getAttribute("data-filter");if(k&&k!=="gq"&&k!=="lq"){F[k]=ev.target.value;scheduleRender()}});
+document.addEventListener("keydown",ev=>{if(ev.key==="Escape"&&modal)closeForm()});
+window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(VIEWS.some(v=>v[0]===h)){view=h;scheduleRender();window.scrollTo(0,0)}});
+
+/* ---------------- Start ---------------- */
+render();
+(async()=>{
+  const timer=setTimeout(()=>{slow=true;scheduleRender()},10000);
+  if(!window.claude||typeof window.claude.use!=="function"){clearTimeout(timer);dbState="none";render();return}
+  try{[db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")])}catch(e){db=null}
+  if(!db){clearTimeout(timer);dbState="none";render();return}
+  if(user){
+    try{isAdmin=await user.canEdit()}catch(e){}
+    let cw=null;try{cw=await user.can("data.write")}catch(e){}
+    try{uid=await user.id()}catch(e){}
+    canWrite=isAdmin||cw===true||(cw===null&&!!uid);
+    roleLabel=isAdmin?"Editor":(canWrite?"Contributor":"Reader");
+  }
+  if(isAdmin){try{assets=await window.claude.use("assets")}catch(e){assets=null}}
+  for(const c of COLLS){
+    db.collection(c).onSnapshot(snap=>{
+      const m=new Map();snap.docs.forEach(d=>{if(d.exists)m.set(d.id,d.data())});data[c]=m;
+      if(!snap.metadata.fromCache)loaded.add(c);
+      if(loaded.size===COLLS.length){clearTimeout(timer);slow=false;dbState="ready"}
+      else if(dbState==="loading"&&snap.docs.length)dbState="partial";
+      scheduleRender();
+    },err=>{loaded.add(c);if(loaded.size===COLLS.length){clearTimeout(timer);dbState="ready"}if(err&&err.code==="revoked")writeError="Your access to the platform has changed. Reload the page.";scheduleRender()});
+  }
+})();
+</script>
+</body>
+</html>
