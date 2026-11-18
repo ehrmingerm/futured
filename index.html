@@ -377,7 +377,7 @@ function render(){
 }
 function notices(){
   let h="";
-  if(dbState==="none")h+=`<div class="notice">The platform's content is stored online and cannot be reached in this view. Open the platform from its claude.ai link, signed in with the account it was shared with.</div>`;
+  if(dbState==="none")h+=`<div class="notice">The platform's content is stored online and cannot be reached in this view. Reload the page and try again.</div>`;
   else if(dbState==="loading"&&slow)h+=`<div class="notice">The content is taking longer than usual to load. Check your connection; the page will update on its own.</div>`;
   if(writeError)h+=`<div class="notice">${esc(writeError)}</div>`;
   return h;
@@ -459,7 +459,7 @@ function vDocuments(){
   const ds=list("documents");
   const groups=cats.map(c=>[c,ds.filter(d=>(d.category||"Reference")===c).sort((a,b)=>String(a.title).localeCompare(String(b.title)))]).filter(g=>g[1].length);
   return `<section class="block"><div class="head"><h2>Key documents</h2>${addBtn("documents","Add a document")}</div>
-    <p class="intro muted">Slides and minutes are under Meetings. Some links open documents stored elsewhere (Google Drive, claude.ai); they open only for people who have access to them.</p>
+    <p class="intro muted">Slides and minutes are under Meetings. Some links open documents stored elsewhere, such as Google Drive; they open only for people who have access to them.</p>
     ${loading()}
     ${groups.length?groups.map(([c,items])=>`<div class="block" style="gap:10px"><div class="label">${esc(c)}</div><div class="list">${items.map(d=>`<div class="item">
       <div class="item-top"><h3 class="grow">${esc(d.title)}</h3>${pill(d.status)}${editBtn("documents",d.id)}</div>
@@ -748,11 +748,11 @@ document.addEventListener("click",async ev=>{
     try{
       const r=await fetch((window.LERP_BLOB_BASE||"/_blob/")+encodeURIComponent(id));if(!r.ok)throw {code:"missing"};
       const blob=await r.blob();
-      const d=window.claude&&typeof window.claude.use==="function"?await window.claude.use("downloads"):null;
+      const d=window.platform&&typeof window.platform.use==="function"?await window.platform.use("downloads"):null;
       if(!d)throw {code:"unavailable"};
       await d.save({filename:name,data:blob});
     }catch(e){
-      if(!(e&&e.code==="declined")){writeError=e&&e.code==="missing"?"This file could not be found. Ask the coordinator to add it again.":"The download is not available in this view. Open the platform from its claude.ai link and try again.";scheduleRender()}
+      if(!(e&&e.code==="declined")){writeError=e&&e.code==="missing"?"This file could not be found. Ask the coordinator to add it again.":"The download is not available in this view. Reload the page and try again.";scheduleRender()}
     }finally{t.disabled=false;t.innerHTML=label}
     return;
   }
@@ -779,8 +779,8 @@ window.addEventListener("hashchange",()=>{const h=location.hash.slice(1);if(VIEW
 render();
 (async()=>{
   const timer=setTimeout(()=>{slow=true;scheduleRender()},10000);
-  if(!window.claude||typeof window.claude.use!=="function"){clearTimeout(timer);dbState="none";render();return}
-  try{[db,user]=await Promise.all([window.claude.use("db"),window.claude.use("user")])}catch(e){db=null}
+  if(!window.platform||typeof window.platform.use!=="function"){clearTimeout(timer);dbState="none";render();return}
+  try{[db,user]=await Promise.all([window.platform.use("db"),window.platform.use("user")])}catch(e){db=null}
   if(!db){clearTimeout(timer);dbState="none";render();return}
   if(user){
     try{isAdmin=await user.canEdit()}catch(e){}
@@ -789,7 +789,7 @@ render();
     canWrite=isAdmin||cw===true||(cw===null&&!!uid);
     roleLabel=isAdmin?"Editor":(canWrite?"Contributor":"Reader");
   }
-  if(isAdmin){try{assets=await window.claude.use("assets")}catch(e){assets=null}}
+  if(isAdmin){try{assets=await window.platform.use("assets")}catch(e){assets=null}}
   for(const c of COLLS){
     db.collection(c).onSnapshot(snap=>{
       const m=new Map();snap.docs.forEach(d=>{if(d.exists)m.set(d.id,d.data())});data[c]=m;

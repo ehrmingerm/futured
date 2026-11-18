@@ -1,4 +1,4 @@
-/* Stand-in for the claude.ai storage, so the page runs on its own.
+/* Stand-in for the online storage, so the page runs on its own.
    Everything stays in the browser: changes disappear when the page is reloaded. */
 (function () {
   var ROLE_KEY = "demo-role";
@@ -69,7 +69,7 @@
     }
   };
 
-  window.claude = {
+  window.platform = {
     use: function (name) {
       var map = { db: db, user: user, assets: role === "editor" ? assets : null, downloads: downloads };
       return Promise.resolve(map[name] || null);
